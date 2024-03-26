@@ -83,7 +83,7 @@ fn to_string_test() {
     let expected_output = "1 \n2 \n3 \n";
 
     // Perform text
-    let output = matrix_to_string(matrix);
+    let output = matrix_to_string(&matrix);
     println!("{}", output);
 
     // Check test
@@ -95,7 +95,7 @@ fn transpose_test() {
     let matrix = [[00, 01, 02], [10, 11, 12], [20, 21, 22]];
     let expected_output = [[00, 10, 20], [01, 11, 21], [02, 12, 22]];
 
-    let transpose = transpose(matrix);
+    let transpose = transpose(&matrix);
     println!("original\n{:?}\ntranspose\n{:?}\n", matrix, transpose);
 
     assert!(transpose == expected_output)
