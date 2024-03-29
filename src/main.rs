@@ -1,7 +1,7 @@
 use std::fmt::Display;
-
+use num::Num;
 fn main() {
-    let matrix = [['q', 'r', 's'], ['t', 'u', 'v'], ['w', 'x', 'y']];
+    let matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
     let transposed_matrix = transpose(&matrix);
     println!(
         "{}\n{}",
@@ -9,6 +9,36 @@ fn main() {
         matrix_to_string(&transposed_matrix)
     )
 }
+fn matrix_multiply<
+    E: Num + Copy,
+    const LH: usize,    // This contract ensures that lhs width == rhs height
+    const LW_RH: usize,
+    const RW: usize
+>(
+    lhs: [[E; LW_RH]; LH],
+    rhs: [[E; RW]; LW_RH],
+) -> [[E; RW]; LH] {
+    let mut product = [[E::zero(); RW]; LH];
+
+    // your logic to assign each element of the product matrix
+    for lhs_row_index in 0..LH {
+        for rhs_col_index in 0..RW {
+
+            let mut dot_product = E::zero();
+
+            for element_index in 0..LW_RH {
+                let lhs_element = lhs[lhs_row_index][element_index];
+                let rhs_element = rhs[element_index][rhs_col_index];
+                
+                dot_product = dot_product + (lhs_element * rhs_element);
+            }
+            
+            product[lhs_row_index][rhs_col_index] = dot_product;
+        }
+    }
+    return product;
+}
+
 /// Swap rows and columns of matrix.
 /// example of equivalent loops
 ///```rust
@@ -62,7 +92,7 @@ fn transpose<E: Default + Copy, const W: usize, const H: usize>(
 
     return transpose;
 }
-fn matrix_to_string<E: Display, const W: usize, const H: usize>(matrix: &[[E; W]; H]) -> String {
+fn matrix_to_string<E: Num + Display, const W: usize, const H: usize>(matrix: &[[E; W]; H]) -> String {
     let mut output = String::new();
 
     for row in matrix.iter() {
@@ -99,4 +129,36 @@ fn transpose_test() {
     println!("original\n{:?}\ntranspose\n{:?}\n", matrix, transpose);
 
     assert!(transpose == expected_output)
+}
+#[test]
+fn mat_mul() {
+    let lhs = [
+        [1, 2, 3], // 4rows X 3columns
+        [1, 2, 3],
+        [4, 5, 6],
+        [4, 5, 6],
+    ];
+
+    let rhs = [
+        [7, 8, 7, 8], // 3rows X 4columns
+        [9, 10, 9, 10],
+        [11, 12, 11, 12],
+    ];
+
+    let expected_product = [
+        [58, 64, 58, 64], // 4rows X 4columns
+        [58, 64, 58, 64],
+        [139, 154, 139, 154],
+        [139, 154, 139, 154],
+    ];
+
+    let product = matrix_multiply(lhs, rhs);
+
+    println!(
+        "{}\n{}",
+        matrix_to_string(&product),
+        matrix_to_string(&expected_product)
+    );
+
+    assert!(product == expected_product);
 }
